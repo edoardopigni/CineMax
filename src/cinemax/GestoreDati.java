@@ -42,7 +42,7 @@ public class GestoreDati {
     }
 
     /**
-     * Legge il file CSV e popola la lista delle proiezioni.
+     * Legge il file CSV gestendo correttamente i campi racchiusi tra virgolette.
      */
     public void caricaProiezioniDalCSV() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -54,27 +54,40 @@ public class GestoreDati {
         }
         
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            String line = br.readLine(); // Salta la prima riga (intestazione)
+            String line = br.readLine(); // Salta l'intestazione
             
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
+                // Usiamo un'espressione regolare per dividere la riga considerando levirgolette
+                String[] values = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+                
                 if (values.length >= 8) {
+                    // Puliamo eventuali virgolette residue dai campi stringa
+                    String dataOra = values[0].replace("\"", "").trim();
+                    String titolo = values[1].replace("\"", "").trim();
+                    String genere = values[2].replace("\"", "").trim();
+                    String regista = values[3].replace("\"", "").trim();
+                    int anno = Integer.parseInt(values[4].replace("\"", "").trim());
+                    int durata = Integer.parseInt(values[5].replace("\"", "").trim());
+                    int etaMin = Integer.parseInt(values[6].replace("\"", "").trim());
+                    double prezzo = Double.parseDouble(values[7].replace("\"", "").trim());
+
                     Proiezione p = new Proiezione(
-                        LocalDateTime.parse(values[0].trim(), formatter),
-                        values[1].trim(),
-                        values[2].trim(),
-                        values[3].trim(),
-                        Integer.parseInt(values[4].trim()),
-                        Integer.parseInt(values[5].trim()),
-                        Integer.parseInt(values[6].trim()),
-                        Double.parseDouble(values[7].trim())
+                        LocalDateTime.parse(dataOra, formatter),
+                        titolo,
+                        genere,
+                        regista,
+                        anno,
+                        durata,
+                        etaMin,
+                        prezzo
                     );
                     listaProiezioni.add(p);
                 }
             }
-            System.out.println("Caricate " + listaProiezioni.size() + " proiezioni dal CSV.");
+            System.out.println("Caricate " + listaProiezioni.size() + " proiezioni dal CSV con successo!");
         } catch (Exception e) {
             System.err.println("Errore durante la lettura del CSV: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
