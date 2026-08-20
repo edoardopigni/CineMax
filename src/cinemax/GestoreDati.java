@@ -132,4 +132,28 @@ public class GestoreDati {
             System.err.println("Errore nel salvataggio prenotazioni: " + e.getMessage());
         }
     }
+
+
+/**
+ * Cerca le proiezioni filtrando per titolo, genere o regista.
+ * 
+ * @param chiaveDiRicerca La parola o frase da cercare
+ * @return Una lista di proiezioni che corrispondono ai criteri
+ */
+public List<Proiezione> ricercaProiezioni(String chiaveDiRicerca) {
+    List<Proiezione> risultati = new ArrayList<>();
+    // Trasformiamo la ricerca in minuscolo per non avere problemi di Case Sensitivity
+    String query = chiaveDiRicerca.toLowerCase().trim();
+
+    for (Proiezione p : listaProiezioni) {
+    	// Controlla se la query è contenuta nel titolo, genere o regista
+        if (p.getTitoloFilm().toLowerCase().contains(query) ||
+            p.getGenere().toLowerCase().contains(query) ||
+            p.getRegista().toLowerCase().contains(query)) {
+            
+            risultati.add(p);
+        }
+    }
+    return risultati;
+	}
 }

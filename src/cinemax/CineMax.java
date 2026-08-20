@@ -1,5 +1,6 @@
 package cinemax;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -31,13 +32,25 @@ public class CineMax {
             String scelta = scanner.nextLine();
             
             switch (scelta) {
-                case "1":
-                    System.out.println("\n--- NAVIGAZIONE GUEST ---");
-                    System.out.print("Inserisci il titolo del film da cercare: ");
-                    String ricerca = scanner.nextLine();
-                    // TODO (Persona A): Implementare metodo di ricerca chiamando db.listaProiezioni
-                    System.out.println("Ricerca di '" + ricerca + "' in corso... (Funzionalità in costruzione)");
-                    break;
+            case "1":
+                System.out.println("\n--- NAVIGAZIONE GUEST ---");
+                System.out.print("Inserisci un titolo, un genere o un regista da cercare: ");
+                String ricerca = scanner.nextLine();
+                
+                // Richiamiamo il metodo creato nel GestoreDati (che si chiama 'db')
+                List<Proiezione> risultati = db.ricercaProiezioni(ricerca);
+                
+                if (risultati.isEmpty()) {
+                    System.out.println("Nessun film trovato con la parola: '" + ricerca + "'");
+                } else {
+                    System.out.println("\n--- RISULTATI TROVATI (" + risultati.size() + ") ---");
+                    for (Proiezione p : risultati) {
+                        // Sfruttiamo il metodo toString() già presente nella tua classe Proiezione
+                        System.out.println(p.toString());
+                    }
+                }
+                System.out.println("-------------------------\n");
+                break;
                     
                 case "2":
                     System.out.println("\n--- LOGIN ---");
