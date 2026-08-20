@@ -30,15 +30,14 @@ public class CineMax {
             System.out.println("0. Esci dal programma");
             System.out.print("> ");
             
-            String scelta = scanner.nextLine();
+            String scelta = scanner.nextLine().trim();
             
             switch (scelta) {
             case "1":
                 System.out.println("\n--- NAVIGAZIONE GUEST ---");
                 System.out.print("Inserisci un titolo, un genere o un regista da cercare: ");
-                String ricerca = scanner.nextLine();
+                String ricerca = scanner.nextLine().trim();
                 
-                // Richiamiamo il metodo creato nel GestoreDati (che si chiama 'db')
                 List<Proiezione> risultati = db.ricercaProiezioni(ricerca);
                 
                 if (risultati.isEmpty()) {
@@ -46,7 +45,6 @@ public class CineMax {
                 } else {
                     System.out.println("\n--- RISULTATI TROVATI (" + risultati.size() + ") ---");
                     for (Proiezione p : risultati) {
-                        // Sfruttiamo il metodo toString() già presente nella tua classe Proiezione
                         System.out.println(p.toString());
                     }
                 }
@@ -65,7 +63,6 @@ public class CineMax {
                 if (utenteLoggato != null) {
                     System.out.println("\nLogin effettuato con successo! Bentornato, " + utenteLoggato.getNome() + ".");
                     
-                    // Smistamento in base al ruolo (usiamo toUpperCase() per sicurezza)
                     switch (utenteLoggato.getRuolo().toUpperCase()) {
                         case "CLIENTE":
                             menuCliente(scanner, db, utenteLoggato);
@@ -124,11 +121,10 @@ public class CineMax {
                     System.out.print("Luogo di Domicilio: ");
                     String domicilio = scanner.nextLine().trim();
                     
-                    // Creazione del nuovo utente con ruolo CLIENTE
                     Utente nuovoCliente = new Utente(nome, cognome, username, password, dataNascita, domicilio, "CLIENTE");
                     
-                    // Aggiunta alla lista e salvataggio su file
-                    db.listaUtenti.add(nuovoCliente);
+                    // REFACTORING: Uso del metodo sicuro per l'aggiunta
+                    db.aggiungiUtente(nuovoCliente);
                     db.salvaUtenti();
                     
                     System.out.println("\nRegistrazione completata con successo! Benvenuto, " + username + ".");
@@ -147,6 +143,7 @@ public class CineMax {
         
         scanner.close();
     }
+
     /**
      * Menu dedicato alle operazioni del Cliente
      */
@@ -165,14 +162,15 @@ public class CineMax {
             switch (scelta) {
             case "1":
                 System.out.println("\n--- PALINSESTO E PRENOTAZIONE ---");
-                if (db.listaProiezioni.isEmpty()) {
+                // REFACTORING: Uso del getter
+                if (db.getListaProiezioni().isEmpty()) {
                     System.out.println("Nessuna proiezione disponibile al momento.");
                     break;
                 }
 
-                // Stampiamo l'elenco dei film con un numero davanti per farlo scegliere
-                for (int i = 0; i < db.listaProiezioni.size(); i++) {
-                    Proiezione p = db.listaProiezioni.get(i);
+                // REFACTORING: Uso del getter
+                for (int i = 0; i < db.getListaProiezioni().size(); i++) {
+                    Proiezione p = db.getListaProiezioni().get(i);
                     int postiDisp = db.calcolaPostiDisponibili(p);
                     System.out.println((i + 1) + ". " + p.toString() + " [Posti disponibili: " + postiDisp + "]");
                 }
@@ -188,13 +186,14 @@ public class CineMax {
 
                 if (sceltaFilm == 0) break;
                 
-                if (sceltaFilm < 1 || sceltaFilm > db.listaProiezioni.size()) {
+                // REFACTORING: Uso del getter
+                if (sceltaFilm < 1 || sceltaFilm > db.getListaProiezioni().size()) {
                     System.out.println("Scelta non valida.");
                     break;
                 }
 
-                // Recuperiamo il film selezionato
-                Proiezione filmScelto = db.listaProiezioni.get(sceltaFilm - 1);
+                // REFACTORING: Uso del getter
+                Proiezione filmScelto = db.getListaProiezioni().get(sceltaFilm - 1);
                 int postiDisponibili = db.calcolaPostiDisponibili(filmScelto);
 
                 System.out.print("Quanti posti vuoi prenotare? ");
@@ -211,7 +210,6 @@ public class CineMax {
                 } else if (numPosti > postiDisponibili) {
                     System.out.println("Spiacenti, per questo film ci sono solo " + postiDisponibili + " posti disponibili.");
                 } else {
-                    // Creazione della prenotazione
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                     String dataOraStr = filmScelto.getDataOraProiezione().format(formatter);
                     
@@ -223,9 +221,9 @@ public class CineMax {
                             filmScelto.getPrezzoBiglietto()
                     );
                     
-                    // Aggiungiamo alla lista nel db
-                    db.listaPrenotazioni.add(nuovaPren);
-                    // TODO: db.salvaPrenotazioni() - per scrivere su file .dat
+                    // REFACTORING: Uso dei metodi sicuri e salvataggio sbloccato
+                    db.aggiungiPrenotazione(nuovaPren);
+                    db.salvaPrenotazioni(); 
                     
                     System.out.println("\n✅ Prenotazione confermata con successo!");
                     System.out.println("Riepilogo: " + nuovaPren.toString());
@@ -236,9 +234,8 @@ public class CineMax {
                 System.out.println("\n--- I MIEI BIGLIETTI ---");
                 boolean trovati = false;
                 
-                // Scorriamo la lista delle prenotazioni globali
-                for (Prenotazione p : db.listaPrenotazioni) {
-                    // Se l'username della prenotazione combacia con l'utente loggato, la stampiamo
+                // REFACTORING: Uso del getter
+                for (Prenotazione p : db.getListaPrenotazioni()) {
                     if (p.getUsernameCliente().equals(cliente.getUsername())) {
                         System.out.println(p.toString());
                         trovati = true;
@@ -252,7 +249,7 @@ public class CineMax {
                 break;
                 case "0":
                     System.out.println("\nLogout effettuato con successo.");
-                    inAreaRiservata = false; // Questo ci fa uscire dal ciclo e tornare al menu principale
+                    inAreaRiservata = false; 
                     break;
                 default:
                     System.out.println("\nScelta non valida. Riprova.");
