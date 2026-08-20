@@ -63,11 +63,21 @@ public class CineMax {
                 
                 if (utenteLoggato != null) {
                     System.out.println("\nLogin effettuato con successo! Bentornato, " + utenteLoggato.getNome() + ".");
-                    System.out.println("Accesso eseguito come: " + utenteLoggato.getRuolo());
                     
-                    // TODO: Qui più avanti metteremo uno switch per aprire il 
-                    // menu specifico (Cliente, Proiezionista o Bigliettaio)
-                    
+                    // Smistamento in base al ruolo (usiamo toUpperCase() per sicurezza)
+                    switch (utenteLoggato.getRuolo().toUpperCase()) {
+                        case "CLIENTE":
+                            menuCliente(scanner, db, utenteLoggato);
+                            break;
+                        case "PROIEZIONISTA":
+                            menuProiezionista(scanner, db, utenteLoggato);
+                            break;
+                        case "BIGLIETTAIO":
+                            menuBigliettaio(scanner, db, utenteLoggato);
+                            break;
+                        default:
+                            System.out.println("Errore: Ruolo non riconosciuto nel sistema.");
+                    }
                 } else {
                     System.out.println("\nErrore: Username o Password non corretti. Riprova.");
                 }
@@ -135,5 +145,54 @@ public class CineMax {
         }
         
         scanner.close();
+    }
+    /**
+     * Menu dedicato alle operazioni del Cliente
+     */
+    private static void menuCliente(Scanner scanner, GestoreDati db, Utente cliente) {
+        boolean inAreaRiservata = true;
+        
+        while (inAreaRiservata) {
+            System.out.println("\n=== AREA CLIENTE: " + cliente.getUsername() + " ===");
+            System.out.println("1. Visualizza il palinsesto e prenota");
+            System.out.println("2. I miei biglietti");
+            System.out.println("0. Logout");
+            System.out.print("Scegli un'opzione: ");
+            
+            String scelta = scanner.nextLine().trim();
+            
+            switch (scelta) {
+                case "1":
+                    System.out.println("\n(Funzionalità prenotazione in costruzione...)");
+                    break;
+                case "2":
+                    System.out.println("\n(Funzionalità storico biglietti in costruzione...)");
+                    break;
+                case "0":
+                    System.out.println("\nLogout effettuato con successo.");
+                    inAreaRiservata = false; // Questo ci fa uscire dal ciclo e tornare al menu principale
+                    break;
+                default:
+                    System.out.println("\nScelta non valida. Riprova.");
+            }
+        }
+    }
+    
+    /**
+     * Menu dedicato al Proiezionista (Task assegnato ad Anes)
+     */
+    private static void menuProiezionista(Scanner scanner, GestoreDati db, Utente proiezionista) {
+        System.out.println("\n--- AREA PROIEZIONISTA ---");
+        System.out.println("Accesso consentito a: " + proiezionista.getNome());
+        System.out.println("Backend in fase di sviluppo. Ritorno al menu principale...");
+    }
+    
+    /**
+     * Menu dedicato al Bigliettaio (Task assegnato ad Anes)
+     */
+    private static void menuBigliettaio(Scanner scanner, GestoreDati db, Utente bigliettaio) {
+        System.out.println("\n--- AREA BIGLIETTAIO ---");
+        System.out.println("Accesso consentito a: " + bigliettaio.getNome());
+        System.out.println("Backend in fase di sviluppo. Ritorno al menu principale...");
     }
 }
