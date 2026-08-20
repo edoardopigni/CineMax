@@ -180,4 +180,21 @@ public Utente verificaCredenziali(String username, String password) {
     }
     return null; // Nessun match trovato
 }
+
+/**
+ * Calcola i posti ancora disponibili per una proiezione.
+ */
+public int calcolaPostiDisponibili(Proiezione p) {
+    int postiOccupati = 0;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    String dataOraTarget = p.getDataOraProiezione().format(formatter);
+    
+    for (Prenotazione pren : listaPrenotazioni) {
+        if (pren.getTitoloFilm().equals(p.getTitoloFilm()) && 
+            pren.getDataOraStringa().equals(dataOraTarget)) {
+            postiOccupati += pren.getNumeroPosti();
+        }
+    }
+    return Proiezione.POSTI_TOTALI - postiOccupati;
+}
 }

@@ -1,5 +1,6 @@
 package cinemax;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
@@ -162,9 +163,75 @@ public class CineMax {
             String scelta = scanner.nextLine().trim();
             
             switch (scelta) {
-                case "1":
-                    System.out.println("\n(Funzionalità prenotazione in costruzione...)");
+            case "1":
+                System.out.println("\n--- PALINSESTO E PRENOTAZIONE ---");
+                if (db.listaProiezioni.isEmpty()) {
+                    System.out.println("Nessuna proiezione disponibile al momento.");
                     break;
+                }
+
+                // Stampiamo l'elenco dei film con un numero davanti per farlo scegliere
+                for (int i = 0; i < db.listaProiezioni.size(); i++) {
+                    Proiezione p = db.listaProiezioni.get(i);
+                    int postiDisp = db.calcolaPostiDisponibili(p);
+                    System.out.println((i + 1) + ". " + p.toString() + " [Posti disponibili: " + postiDisp + "]");
+                }
+
+                System.out.print("\nInserisci il numero del film che vuoi prenotare (0 per annullare): ");
+                int sceltaFilm = 0;
+                try {
+                    sceltaFilm = Integer.parseInt(scanner.nextLine().trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("Errore: devi inserire un numero intero.");
+                    break;
+                }
+
+                if (sceltaFilm == 0) break;
+                
+                if (sceltaFilm < 1 || sceltaFilm > db.listaProiezioni.size()) {
+                    System.out.println("Scelta non valida.");
+                    break;
+                }
+
+                // Recuperiamo il film selezionato
+                Proiezione filmScelto = db.listaProiezioni.get(sceltaFilm - 1);
+                int postiDisponibili = db.calcolaPostiDisponibili(filmScelto);
+
+                System.out.print("Quanti posti vuoi prenotare? ");
+                int numPosti = 0;
+                try {
+                    numPosti = Integer.parseInt(scanner.nextLine().trim());
+                } catch (NumberFormatException e) {
+                    System.out.println("Errore: devi inserire un numero intero.");
+                    break;
+                }
+
+                if (numPosti <= 0) {
+                    System.out.println("Devi prenotare almeno un posto.");
+                } else if (numPosti > postiDisponibili) {
+                    System.out.println("Spiacenti, per questo film ci sono solo " + postiDisponibili + " posti disponibili.");
+                } else {
+                    // Creazione della prenotazione
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                    String dataOraStr = filmScelto.getDataOraProiezione().format(formatter);
+                    
+                    Prenotazione nuovaPren = new Prenotazione(
+                            cliente.getUsername(), 
+                            filmScelto.getTitoloFilm(), 
+                            dataOraStr, 
+                            numPosti, 
+                            filmScelto.getPrezzoBiglietto()
+                    );
+                    
+                    // Aggiungiamo alla lista nel db
+                    db.listaPrenotazioni.add(nuovaPren);
+                    // TODO: db.salvaPrenotazioni() - per scrivere su file .dat
+                    
+                    System.out.println("\n✅ Prenotazione confermata con successo!");
+                    System.out.println("Riepilogo: " + nuovaPren.toString());
+                }
+                System.out.println("---------------------------------\n");
+                break;
                 case "2":
                     System.out.println("\n(Funzionalità storico biglietti in costruzione...)");
                     break;
