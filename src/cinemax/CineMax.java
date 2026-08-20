@@ -52,15 +52,27 @@ public class CineMax {
                 System.out.println("-------------------------\n");
                 break;
                     
-                case "2":
-                    System.out.println("\n--- LOGIN ---");
-                    System.out.print("Username: ");
-                    String user = scanner.nextLine();
-                    System.out.print("Password: ");
-                    String pass = scanner.nextLine();
-                    // TODO: Implementare verifica credenziali scansionando db.listaUtenti
-                    System.out.println("Verifica in corso... (Funzionalità in costruzione)");
-                    break;
+            case "2":
+                System.out.println("\n--- LOGIN ---");
+                System.out.print("Username: ");
+                String user = scanner.nextLine().trim();
+                System.out.print("Password: ");
+                String pass = scanner.nextLine().trim();
+                
+                Utente utenteLoggato = db.verificaCredenziali(user, pass);
+                
+                if (utenteLoggato != null) {
+                    System.out.println("\nLogin effettuato con successo! Bentornato, " + utenteLoggato.getNome() + ".");
+                    System.out.println("Accesso eseguito come: " + utenteLoggato.getRuolo());
+                    
+                    // TODO: Qui più avanti metteremo uno switch per aprire il 
+                    // menu specifico (Cliente, Proiezionista o Bigliettaio)
+                    
+                } else {
+                    System.out.println("\nErrore: Username o Password non corretti. Riprova.");
+                }
+                System.out.println("-------------\n");
+                break;
                     
                 case "3":
                     System.out.println("\n--- REGISTRAZIONE NUOVO CLIENTE ---");

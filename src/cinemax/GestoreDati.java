@@ -167,4 +167,17 @@ public boolean usernameGiaEsistente(String username) {
     }
     return false;
 }
+
+/**
+ * Verifica le credenziali di accesso.
+ * @return L'oggetto Utente se il login ha successo, null se le credenziali sono errate.
+ */
+public Utente verificaCredenziali(String username, String password) {
+    for (Utente u : listaUtenti) {
+        if (u.getUsername().equals(username.trim()) && u.getPassword().equals(password.trim())) {
+            return u; // Trovato e password corretta!
+        }
+    }
+    return null; // Nessun match trovato
+}
 }
