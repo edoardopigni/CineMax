@@ -156,4 +156,15 @@ public List<Proiezione> ricercaProiezioni(String chiaveDiRicerca) {
     }
     return risultati;
 	}
+/**
+ * Verifica se uno username è già presente nella lista utenti.
+ */
+public boolean usernameGiaEsistente(String username) {
+    for (Utente u : listaUtenti) {
+        if (u.getUsername().equalsIgnoreCase(username.trim())) {
+            return true;
+        }
+    }
+    return false;
+}
 }

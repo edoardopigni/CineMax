@@ -63,9 +63,53 @@ public class CineMax {
                     break;
                     
                 case "3":
-                    System.out.println("\n--- REGISTRAZIONE CLIENTE ---");
-                    // TODO (Persona A): Chiedere dati in input, creare oggetto Utente e chiamare db.salvaUtenti()
-                    System.out.println("Funzionalità in costruzione...");
+                    System.out.println("\n--- REGISTRAZIONE NUOVO CLIENTE ---");
+                    
+                    System.out.print("Nome: ");
+                    String nome = scanner.nextLine().trim();
+                    
+                    System.out.print("Cognome: ");
+                    String cognome = scanner.nextLine().trim();
+                    
+                    String username;
+                    while (true) {
+                        System.out.print("Username: ");
+                        username = scanner.nextLine().trim();
+                        if (username.isEmpty()) {
+                            System.out.println("L'username non può essere vuoto.");
+                        } else if (db.usernameGiaEsistente(username)) {
+                            System.out.println("Username già in uso! Scegline un altro.");
+                        } else {
+                            break;
+                        }
+                    }
+                    
+                    String password;
+                    while (true) {
+                        System.out.print("Password: ");
+                        password = scanner.nextLine().trim();
+                        if (password.isEmpty()) {
+                            System.out.println("La password non può essere vuota.");
+                        } else {
+                            break;
+                        }
+                    }
+                    
+                    System.out.print("Data di Nascita (es. GG/MM/AAAA): ");
+                    String dataNascita = scanner.nextLine().trim();
+                    
+                    System.out.print("Luogo di Domicilio: ");
+                    String domicilio = scanner.nextLine().trim();
+                    
+                    // Creazione del nuovo utente con ruolo CLIENTE
+                    Utente nuovoCliente = new Utente(nome, cognome, username, password, dataNascita, domicilio, "CLIENTE");
+                    
+                    // Aggiunta alla lista e salvataggio su file
+                    db.listaUtenti.add(nuovoCliente);
+                    db.salvaUtenti();
+                    
+                    System.out.println("\nRegistrazione completata con successo! Benvenuto, " + username + ".");
+                    System.out.println("-----------------------------------\n");
                     break;
                     
                 case "0":
