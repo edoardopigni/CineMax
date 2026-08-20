@@ -232,9 +232,24 @@ public class CineMax {
                 }
                 System.out.println("---------------------------------\n");
                 break;
-                case "2":
-                    System.out.println("\n(Funzionalità storico biglietti in costruzione...)");
-                    break;
+            case "2":
+                System.out.println("\n--- I MIEI BIGLIETTI ---");
+                boolean trovati = false;
+                
+                // Scorriamo la lista delle prenotazioni globali
+                for (Prenotazione p : db.listaPrenotazioni) {
+                    // Se l'username della prenotazione combacia con l'utente loggato, la stampiamo
+                    if (p.getUsernameCliente().equals(cliente.getUsername())) {
+                        System.out.println(p.toString());
+                        trovati = true;
+                    }
+                }
+                
+                if (!trovati) {
+                    System.out.println("Non hai ancora effettuato nessuna prenotazione.");
+                }
+                System.out.println("------------------------\n");
+                break;
                 case "0":
                     System.out.println("\nLogout effettuato con successo.");
                     inAreaRiservata = false; // Questo ci fa uscire dal ciclo e tornare al menu principale

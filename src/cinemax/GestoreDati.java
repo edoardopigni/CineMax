@@ -197,4 +197,5 @@ public int calcolaPostiDisponibili(Proiezione p) {
     }
     return Proiezione.POSTI_TOTALI - postiOccupati;
 }
+
 }
