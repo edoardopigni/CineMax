@@ -211,4 +211,40 @@ public class GestoreDati {
         }
         return Proiezione.POSTI_TOTALI - postiOccupati;
     }
+
+    public void salvaProiezioniSuCSV() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        try (PrintWriter pw = new PrintWriter(new FileWriter(FILE_PROIEZIONI_CSV))) {
+            pw.println("data_ora,titolo,genere,regista,anno,durata,eta_minima,prezzo");
+            for (Proiezione p : listaProiezioni) {
+                pw.printf("\"%s\",\"%s\",\"%s\",\"%s\",%d,%d,%d,%.2f%n",
+                        p.getDataOraProiezione().format(formatter),
+                        p.getTitoloFilm(),
+                        p.getGenere(),
+                        p.getRegista(),
+                        p.getAnno(),
+                        p.getDurataMinuti(),
+                        p.getEtaMinima(),
+                        p.getPrezzoBiglietto()
+                );
+            }
+            System.out.println("File CSV delle proiezioni aggiornato con successo!");
+        } catch (IOException e) {
+            System.err.println("Errore nel salvataggio del CSV proiezioni: " + e.getMessage());
+        }
+    }
+
+    public boolean haPrenotazioniEsistenti(Proiezione p) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String dataOraTarget = p.getDataOraProiezione().format(formatter);
+        for (Prenotazione pren : listaPrenotazioni) {
+            if (pren.getTitoloFilm().equalsIgnoreCase(p.getTitoloFilm()) &&
+                    pren.getDataOraStringa().equals(dataOraTarget)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

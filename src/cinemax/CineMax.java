@@ -256,22 +256,161 @@ public class CineMax {
             }
         }
     }
-    
-    /**
-     * Menu dedicato al Proiezionista (Task assegnato ad Anes)
-     */
+
     private static void menuProiezionista(Scanner scanner, GestoreDati db, Utente proiezionista) {
-        System.out.println("\n--- AREA PROIEZIONISTA ---");
-        System.out.println("Accesso consentito a: " + proiezionista.getNome());
-        System.out.println("Backend in fase di sviluppo. Ritorno al menu principale...");
+        boolean inMenu = true;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        while (inMenu) {
+            System.out.println("\n=== AREA PROIEZIONISTA (" + proiezionista.getNome() + ") ===");
+            System.out.println("1. Inserisci nuova proiezione");
+            System.out.println("2. Modifica data/ora proiezione");
+            System.out.println("3. Elimina proiezione");
+            System.out.println("0. Logout");
+            System.out.print("Scegli un'opzione: ");
+
+            String scelta = scanner.nextLine().trim();
+
+            switch (scelta) {
+                case "1":
+                    System.out.println("\n--- NUOVA PROIEZIONE ---");
+                    System.out.print("Titolo film: ");
+                    String titolo = scanner.nextLine().trim();
+                    System.out.print("Genere: ");
+                    String genere = scanner.nextLine().trim();
+                    System.out.print("Regista: ");
+                    String regista = scanner.nextLine().trim();
+                    System.out.print("Anno di uscita: ");
+                    int anno = Integer.parseInt(scanner.nextLine().trim());
+                    System.out.print("Durata (minuti): ");
+                    int durata = Integer.parseInt(scanner.nextLine().trim());
+                    System.out.print("Età minima: ");
+                    int etaMin = Integer.parseInt(scanner.nextLine().trim());
+                    System.out.print("Prezzo biglietto: ");
+                    double prezzo = Double.parseDouble(scanner.nextLine().trim().replace(",", "."));
+                    System.out.print("Data e ora (formato: YYYY-MM-DD HH:mm:ss): ");
+                    String dataOraStr = scanner.nextLine().trim();
+
+                    Proiezione nuovaP = new Proiezione(
+                            java.time.LocalDateTime.parse(dataOraStr, formatter),
+                            titolo, genere, regista, anno, durata, etaMin, prezzo
+                    );
+                    db.getListaProiezioni().add(nuovaP);
+                    db.salvaProiezioniSuCSV();
+                    System.out.println("✅ Proiezione aggiunta e salvata su CSV!");
+                    break;
+
+                case "2":
+                    System.out.println("\n--- MODIFICA DATA/ORA PROIEZIONE ---");
+                    for (int i = 0; i < db.getListaProiezioni().size(); i++) {
+                        System.out.println((i + 1) + ". " + db.getListaProiezioni().get(i).toString());
+                    }
+                    System.out.print("Seleziona il numero della proiezione da modificare: ");
+                    int idxMod = Integer.parseInt(scanner.nextLine().trim()) - 1;
+                    if (idxMod >= 0 && idxMod < db.getListaProiezioni().size()) {
+                        Proiezione pMod = db.getListaProiezioni().get(idxMod);
+                        if (db.haPrenotazioniEsistenti(pMod)) {
+                            System.out.println("❌ Impossibile modificare: esistono già prenotazioni per questa proiezione!");
+                        } else {
+                            System.out.print("Nuova Data e Ora (YYYY-MM-DD HH:mm:ss): ");
+                            String nuovaDataOra = scanner.nextLine().trim();
+                            pMod.setDataOraProiezione(java.time.LocalDateTime.parse(nuovaDataOra, formatter));
+                            db.salvaProiezioniSuCSV();
+                            System.out.println("✅ Data e ora modificate con successo!");
+                        }
+                    }
+                    break;
+
+                case "3":
+                    System.out.println("\n--- ELIMINA PROIEZIONE ---");
+                    for (int i = 0; i < db.getListaProiezioni().size(); i++) {
+                        System.out.println((i + 1) + ". " + db.getListaProiezioni().get(i).toString());
+                    }
+                    System.out.print("Seleziona il numero della proiezione da eliminare: ");
+                    int idxDel = Integer.parseInt(scanner.nextLine().trim()) - 1;
+                    if (idxDel >= 0 && idxDel < db.getListaProiezioni().size()) {
+                        Proiezione pDel = db.getListaProiezioni().get(idxDel);
+                        if (db.haPrenotazioniEsistenti(pDel)) {
+                            System.out.println("❌ Impossibile eliminare: ci sono prenotazioni attive collegate!");
+                        } else {
+                            db.getListaProiezioni().remove(idxDel);
+                            db.salvaProiezioniSuCSV();
+                            System.out.println("✅ Proiezione eliminata!");
+                        }
+                    }
+                    break;
+
+                case "0":
+                    inMenu = false;
+                    break;
+                default:
+                    System.out.println("Scelta non valida.");
+            }
+        }
     }
-    
-    /**
-     * Menu dedicato al Bigliettaio (Task assegnato ad Anes)
-     */
+
+
     private static void menuBigliettaio(Scanner scanner, GestoreDati db, Utente bigliettaio) {
-        System.out.println("\n--- AREA BIGLIETTAIO ---");
-        System.out.println("Accesso consentito a: " + bigliettaio.getNome());
-        System.out.println("Backend in fase di sviluppo. Ritorno al menu principale...");
+        boolean inMenu = true;
+        java.time.format.DateTimeFormatter formatterGiorno = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String oggiStr = java.time.LocalDate.now().format(formatterGiorno);
+
+        while (inMenu) {
+            System.out.println("\n=== AREA BIGLIETTAIO (" + bigliettaio.getNome() + ") ===");
+            System.out.println("1. Cerca prenotazione (per Codice, Username o Data)");
+            System.out.println("2. Visualizza prenotazioni di OGGI (" + oggiStr + ")");
+            System.out.println("0. Logout");
+            System.out.print("Scegli un'opzione: ");
+
+            String scelta = scanner.nextLine().trim();
+
+            switch (scelta) {
+                case "1":
+                    System.out.println("\n--- RICERCA PRENOTAZIONI ---");
+                    System.out.print("Inserisci Codice Prenotazione, Username Cliente o Data (GG/MM/AAAA): ");
+                    String query = scanner.nextLine().trim().toLowerCase();
+
+                    boolean trovate = false;
+                    for (Prenotazione pren : db.getListaPrenotazioni()) {
+                        if (pren.getCodicePrenotazione().toLowerCase().contains(query) ||
+                                pren.getUsernameCliente().toLowerCase().contains(query) ||
+                                pren.getDataOraStringa().contains(query)) {
+
+                            System.out.println("• " + pren.toString() + " [Cliente: " + pren.getUsernameCliente() + "]");
+                            trovate = true;
+                        }
+                    }
+
+                    if (!trovate) {
+                        System.out.println("Nessuna prenotazione trovata per il parametro inserito.");
+                    }
+                    System.out.println("----------------------------\n");
+                    break;
+
+                case "2":
+                    System.out.println("\n--- PRENOTAZIONI DI OGGI (" + oggiStr + ") ---");
+                    boolean trovateOggi = false;
+
+                    for (Prenotazione pren : db.getListaPrenotazioni()) {
+                        if (pren.getDataOraStringa().startsWith(oggiStr)) {
+                            System.out.println("• " + pren.toString() + " [Cliente: " + pren.getUsernameCliente() + "]");
+                            trovateOggi = true;
+                        }
+                    }
+
+                    if (!trovateOggi) {
+                        System.out.println("Nessuna prenotazione registrata per la data odierna.");
+                    }
+                    System.out.println("----------------------------------------\n");
+                    break;
+
+                case "0":
+                    inMenu = false;
+                    break;
+
+                default:
+                    System.out.println("Scelta non valida.");
+            }
+        }
     }
 }
