@@ -5,8 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0eab1272-4ec8-4727-b2c9-85da98db973f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/proiezioni.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/proiezioni.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/utenti.dat" beforeDir="false" afterPath="$PROJECT_DIR$/data/utenti.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cinemax/CineMax.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cinemax/CineMax.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cinemax/GestoreDati.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cinemax/GestoreDati.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cinemax/Prenotazione.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/cinemax/Prenotazione.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

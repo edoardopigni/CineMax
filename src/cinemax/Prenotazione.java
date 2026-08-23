@@ -83,6 +83,6 @@ public class Prenotazione implements Serializable {
 
     @Override
     public String toString() {
-        return "Prenotazione " + codicePrenotazione + ": " + titoloFilm + " il " + dataOraStringa + " - Posti: " + numeroPosti + " (" + costoTotale + "€)";
+        return "Prenotazione " + codicePrenotazione + ": " + titoloFilm + " il " + dataOraStringa + " - Posti: " + numeroPosti + " (" + costoTotale + "EUR)";
     }
 }

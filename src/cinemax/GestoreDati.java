@@ -160,12 +160,19 @@ public class GestoreDati {
         List<Proiezione> risultati = new ArrayList<>();
         String query = chiaveDiRicerca.toLowerCase().trim();
 
+        //prova
+        LocalDateTime adesso = LocalDateTime.now();
+
         for (Proiezione p : listaProiezioni) {
-            if (p.getTitoloFilm().toLowerCase().contains(query) ||
-                p.getGenere().toLowerCase().contains(query) ||
-                p.getRegista().toLowerCase().contains(query)) {
-                
-                risultati.add(p);
+
+            //prova
+            if(p.getDataOraProiezione().isAfter(adesso)) {
+                if (p.getTitoloFilm().toLowerCase().contains(query) ||
+                        p.getGenere().toLowerCase().contains(query) ||
+                        p.getRegista().toLowerCase().contains(query)) {
+
+                    risultati.add(p);
+                }
             }
         }
         return risultati;

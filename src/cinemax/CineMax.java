@@ -1,6 +1,9 @@
 package cinemax;
 
 import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -163,14 +166,24 @@ public class CineMax {
             case "1":
                 System.out.println("\n--- PALINSESTO E PRENOTAZIONE ---");
                 // REFACTORING: Uso del getter
+
+                //prova per visualizzare solo prenotazioni future(da ora in poi)
+                LocalDateTime adesso = LocalDateTime.now();
+                List<Proiezione> proiezioniFuture = new ArrayList<>();
+                for (Proiezione p : db.getListaProiezioni()){
+                    if (p.getDataOraProiezione().isAfter(adesso)){
+                        proiezioniFuture.add(p);
+                    }
+                }
+
                 if (db.getListaProiezioni().isEmpty()) {
                     System.out.println("Nessuna proiezione disponibile al momento.");
                     break;
                 }
 
                 // REFACTORING: Uso del getter
-                for (int i = 0; i < db.getListaProiezioni().size(); i++) {
-                    Proiezione p = db.getListaProiezioni().get(i);
+                for (int i = 0; i < proiezioniFuture.size(); i++) {
+                    Proiezione p = proiezioniFuture.get(i);
                     int postiDisp = db.calcolaPostiDisponibili(p);
                     System.out.println((i + 1) + ". " + p.toString() + " [Posti disponibili: " + postiDisp + "]");
                 }
@@ -187,13 +200,13 @@ public class CineMax {
                 if (sceltaFilm == 0) break;
                 
                 // REFACTORING: Uso del getter
-                if (sceltaFilm < 1 || sceltaFilm > db.getListaProiezioni().size()) {
+                if (sceltaFilm < 1 || sceltaFilm > proiezioniFuture.size()) {
                     System.out.println("Scelta non valida.");
                     break;
                 }
 
                 // REFACTORING: Uso del getter
-                Proiezione filmScelto = db.getListaProiezioni().get(sceltaFilm - 1);
+                Proiezione filmScelto = proiezioniFuture.get(sceltaFilm - 1);
                 int postiDisponibili = db.calcolaPostiDisponibili(filmScelto);
 
                 System.out.print("Quanti posti vuoi prenotare? ");
@@ -259,7 +272,7 @@ public class CineMax {
 
     private static void menuProiezionista(Scanner scanner, GestoreDati db, Utente proiezionista) {
         boolean inMenu = true;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         while (inMenu) {
             System.out.println("\n=== AREA PROIEZIONISTA (" + proiezionista.getNome() + ") ===");
@@ -273,70 +286,108 @@ public class CineMax {
 
             switch (scelta) {
                 case "1":
-                    System.out.println("\n--- NUOVA PROIEZIONE ---");
-                    System.out.print("Titolo film: ");
-                    String titolo = scanner.nextLine().trim();
-                    System.out.print("Genere: ");
-                    String genere = scanner.nextLine().trim();
-                    System.out.print("Regista: ");
-                    String regista = scanner.nextLine().trim();
-                    System.out.print("Anno di uscita: ");
-                    int anno = Integer.parseInt(scanner.nextLine().trim());
-                    System.out.print("Durata (minuti): ");
-                    int durata = Integer.parseInt(scanner.nextLine().trim());
-                    System.out.print("Età minima: ");
-                    int etaMin = Integer.parseInt(scanner.nextLine().trim());
-                    System.out.print("Prezzo biglietto: ");
-                    double prezzo = Double.parseDouble(scanner.nextLine().trim().replace(",", "."));
-                    System.out.print("Data e ora (formato: YYYY-MM-DD HH:mm:ss): ");
-                    String dataOraStr = scanner.nextLine().trim();
+                    try {
+                        System.out.println("\n--- NUOVA PROIEZIONE ---");
+                        System.out.print("Titolo film: ");
+                        String titolo = scanner.nextLine().trim();
+                        System.out.print("Genere: ");
+                        String genere = scanner.nextLine().trim();
+                        System.out.print("Regista: ");
+                        String regista = scanner.nextLine().trim();
+                        System.out.print("Anno di uscita: ");
+                        int anno = Integer.parseInt(scanner.nextLine().trim());
+                        System.out.print("Durata (minuti): ");
+                        int durata = Integer.parseInt(scanner.nextLine().trim());
+                        System.out.print("Età minima: ");
+                        int etaMin = Integer.parseInt(scanner.nextLine().trim());
+                        System.out.print("Prezzo biglietto: ");
+                        double prezzo = Double.parseDouble(scanner.nextLine().trim().replace(",", "."));
 
-                    Proiezione nuovaP = new Proiezione(
-                            java.time.LocalDateTime.parse(dataOraStr, formatter),
-                            titolo, genere, regista, anno, durata, etaMin, prezzo
-                    );
-                    db.getListaProiezioni().add(nuovaP);
-                    db.salvaProiezioniSuCSV();
-                    System.out.println("✅ Proiezione aggiunta e salvata su CSV!");
+                        LocalDateTime dataOra = null;
+                        while (dataOra == null) {
+                            System.out.print("Data e ora (formato: YYYY-MM-DD HH:mm): ");
+                            String dataOraStr = scanner.nextLine().trim();
+                            try {
+                                dataOra = LocalDateTime.parse(dataOraStr, formatter);
+                            } catch (DateTimeParseException e) {
+                                System.out.println("❌ Formato data non valido! Usa YYYY-MM-DD HH:mm (es. 2026-08-31 20:00)");
+                            }
+                        }
+
+                        Proiezione nuovaP = new Proiezione(dataOra, titolo, genere, regista, anno, durata, etaMin, prezzo);
+                        db.getListaProiezioni().add(nuovaP);
+                        db.salvaProiezioniSuCSV();
+                        System.out.println("Proiezione aggiunta e salvata su CSV!");
+                    } catch (NumberFormatException e) {
+                        System.out.println("Errore nell'inserimento dei valori numerici (anno, durata, età o prezzo). Operazione annullata.");
+                    }
                     break;
 
                 case "2":
                     System.out.println("\n--- MODIFICA DATA/ORA PROIEZIONE ---");
+                    if (db.getListaProiezioni().isEmpty()) {
+                        System.out.println("Nessuna proiezione disponibile.");
+                        break;
+                    }
                     for (int i = 0; i < db.getListaProiezioni().size(); i++) {
                         System.out.println((i + 1) + ". " + db.getListaProiezioni().get(i).toString());
                     }
                     System.out.print("Seleziona il numero della proiezione da modificare: ");
-                    int idxMod = Integer.parseInt(scanner.nextLine().trim()) - 1;
-                    if (idxMod >= 0 && idxMod < db.getListaProiezioni().size()) {
-                        Proiezione pMod = db.getListaProiezioni().get(idxMod);
-                        if (db.haPrenotazioniEsistenti(pMod)) {
-                            System.out.println("❌ Impossibile modificare: esistono già prenotazioni per questa proiezione!");
+                    try {
+                        int idxMod = Integer.parseInt(scanner.nextLine().trim()) - 1;
+                        if (idxMod >= 0 && idxMod < db.getListaProiezioni().size()) {
+                            Proiezione pMod = db.getListaProiezioni().get(idxMod);
+                            if (db.haPrenotazioniEsistenti(pMod)) {
+                                System.out.println("Impossibile modificare: esistono già prenotazioni per questa proiezione!");
+                            } else {
+                                LocalDateTime nuovaDataOra = null;
+                                while (nuovaDataOra == null) {
+                                    System.out.print("Nuova Data e Ora (YYYY-MM-DD HH:mm): ");
+                                    String nuovaDataOraStr = scanner.nextLine().trim();
+                                    try {
+                                        nuovaDataOra = LocalDateTime.parse(nuovaDataOraStr, formatter);
+                                    } catch (DateTimeParseException e) {
+                                        System.out.println("Formato data non valido! Usa YYYY-MM-DD HH:mm (es. 2026-08-31 20:00)");
+                                    }
+                                }
+                                pMod.setDataOraProiezione(nuovaDataOra);
+                                db.salvaProiezioniSuCSV();
+                                System.out.println("Data e ora modificate con successo!");
+                            }
                         } else {
-                            System.out.print("Nuova Data e Ora (YYYY-MM-DD HH:mm:ss): ");
-                            String nuovaDataOra = scanner.nextLine().trim();
-                            pMod.setDataOraProiezione(java.time.LocalDateTime.parse(nuovaDataOra, formatter));
-                            db.salvaProiezioniSuCSV();
-                            System.out.println("✅ Data e ora modificate con successo!");
+                            System.out.println("Numero proiezione non valido.");
                         }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Inserisci un numero valido.");
                     }
                     break;
 
                 case "3":
                     System.out.println("\n--- ELIMINA PROIEZIONE ---");
+                    if (db.getListaProiezioni().isEmpty()) {
+                        System.out.println("Nessuna proiezione disponibile.");
+                        break;
+                    }
                     for (int i = 0; i < db.getListaProiezioni().size(); i++) {
                         System.out.println((i + 1) + ". " + db.getListaProiezioni().get(i).toString());
                     }
                     System.out.print("Seleziona il numero della proiezione da eliminare: ");
-                    int idxDel = Integer.parseInt(scanner.nextLine().trim()) - 1;
-                    if (idxDel >= 0 && idxDel < db.getListaProiezioni().size()) {
-                        Proiezione pDel = db.getListaProiezioni().get(idxDel);
-                        if (db.haPrenotazioniEsistenti(pDel)) {
-                            System.out.println("❌ Impossibile eliminare: ci sono prenotazioni attive collegate!");
+                    try {
+                        int idxDel = Integer.parseInt(scanner.nextLine().trim()) - 1;
+                        if (idxDel >= 0 && idxDel < db.getListaProiezioni().size()) {
+                            Proiezione pDel = db.getListaProiezioni().get(idxDel);
+                            if (db.haPrenotazioniEsistenti(pDel)) {
+                                System.out.println("Impossibile eliminare: ci sono prenotazioni attive collegate!");
+                            } else {
+                                db.getListaProiezioni().remove(idxDel);
+                                db.salvaProiezioniSuCSV();
+                                System.out.println("Proiezione eliminata!");
+                            }
                         } else {
-                            db.getListaProiezioni().remove(idxDel);
-                            db.salvaProiezioniSuCSV();
-                            System.out.println("✅ Proiezione eliminata!");
+                            System.out.println("Numero proiezione non valido.");
                         }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Inserisci un numero valido.");
                     }
                     break;
 
