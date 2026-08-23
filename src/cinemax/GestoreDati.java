@@ -15,10 +15,32 @@ public class GestoreDati {
     private static final String FILE_PRENOTAZIONI = "data/prenotazioni.dat";
     private static final String FILE_PROIEZIONI_CSV = "data/proiezioni.csv";
 
-    // Liste in memoria che fungono da database durante l'esecuzione
-    public List<Utente> listaUtenti = new ArrayList<>();
-    public List<Prenotazione> listaPrenotazioni = new ArrayList<>();
-    public List<Proiezione> listaProiezioni = new ArrayList<>();
+    // Liste in memoria rese PRIVATE per l'incapsulamento
+    private List<Utente> listaUtenti = new ArrayList<>();
+    private List<Prenotazione> listaPrenotazioni = new ArrayList<>();
+    private List<Proiezione> listaProiezioni = new ArrayList<>();
+
+    // --- GETTER PER LE LISTE ---
+    public List<Proiezione> getListaProiezioni() {
+        return listaProiezioni;
+    }
+
+    public List<Prenotazione> getListaPrenotazioni() {
+        return listaPrenotazioni;
+    }
+
+    // --- METODI CONTROLLATI PER AGGIUNGERE ELEMENTI ---
+    public void aggiungiUtente(Utente u) {
+        if (u != null) {
+            listaUtenti.add(u);
+        }
+    }
+
+    public void aggiungiPrenotazione(Prenotazione p) {
+        if (p != null) {
+            listaPrenotazioni.add(p);
+        }
+    }
 
     /**
      * Metodo da richiamare all'avvio dell'applicazione.
@@ -57,11 +79,9 @@ public class GestoreDati {
             String line = br.readLine(); // Salta l'intestazione
             
             while ((line = br.readLine()) != null) {
-                // Usiamo un'espressione regolare per dividere la riga considerando levirgolette
                 String[] values = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
                 
                 if (values.length >= 8) {
-                    // Puliamo eventuali virgolette residue dai campi stringa
                     String dataOra = values[0].replace("\"", "").trim();
                     String titolo = values[1].replace("\"", "").trim();
                     String genere = values[2].replace("\"", "").trim();
@@ -131,5 +151,64 @@ public class GestoreDati {
         } catch (IOException e) {
             System.err.println("Errore nel salvataggio prenotazioni: " + e.getMessage());
         }
+    }
+
+    /**
+     * Cerca le proiezioni filtrando per titolo, genere o regista.
+     */
+    public List<Proiezione> ricercaProiezioni(String chiaveDiRicerca) {
+        List<Proiezione> risultati = new ArrayList<>();
+        String query = chiaveDiRicerca.toLowerCase().trim();
+
+        for (Proiezione p : listaProiezioni) {
+            if (p.getTitoloFilm().toLowerCase().contains(query) ||
+                p.getGenere().toLowerCase().contains(query) ||
+                p.getRegista().toLowerCase().contains(query)) {
+                
+                risultati.add(p);
+            }
+        }
+        return risultati;
+    }
+
+    /**
+     * Verifica se uno username è già presente nella lista utenti.
+     */
+    public boolean usernameGiaEsistente(String username) {
+        for (Utente u : listaUtenti) {
+            if (u.getUsername().equalsIgnoreCase(username.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Verifica le credenziali di accesso.
+     */
+    public Utente verificaCredenziali(String username, String password) {
+        for (Utente u : listaUtenti) {
+            if (u.getUsername().equals(username.trim()) && u.getPassword().equals(password.trim())) {
+                return u; 
+            }
+        }
+        return null; 
+    }
+
+    /**
+     * Calcola i posti ancora disponibili per una proiezione.
+     */
+    public int calcolaPostiDisponibili(Proiezione p) {
+        int postiOccupati = 0;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String dataOraTarget = p.getDataOraProiezione().format(formatter);
+        
+        for (Prenotazione pren : listaPrenotazioni) {
+            if (pren.getTitoloFilm().equals(p.getTitoloFilm()) && 
+                pren.getDataOraStringa().equals(dataOraTarget)) {
+                postiOccupati += pren.getNumeroPosti();
+            }
+        }
+        return Proiezione.POSTI_TOTALI - postiOccupati;
     }
 }
