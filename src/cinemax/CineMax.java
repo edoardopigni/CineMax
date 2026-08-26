@@ -5,10 +5,29 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Classe principale contenente il metodo main per l'avvio dell'applicazione.
+ * Classe principale (Entry Point) dell'applicazione CineMax.
+ * <p>
+ * Gestisce l'interfaccia a riga di comando (CLI), il loop dei menu principali,
+ * i flussi di registrazione, il login e l'instradamento verso le aree riservate
+ * in base al ruolo dell'utente autenticato (Cliente, Proiezionista, Bigliettaio).
+ * </p>
+ * 
+ * @author Daniele Paoli
+ * @author Edoardo Pigni
+ * @author Anes Khaia
+ * @version 1.0
  */
 public class CineMax {
 
+    /**
+     * Metodo di avvio principale del programma.
+     * <p>
+     * Inizializza il {@link GestoreDati}, carica le strutture in memoria dai file persistenti
+     * e avvia il loop di interazione con l'utente tramite standard input.
+     * </p>
+     * 
+     * @param args argomenti passati da riga di comando (non utilizzati in questa applicazione)
+     */
     public static void main(String[] args) {
         System.out.println("=================================");
         System.out.println("   BENVENUTO IN CINEMAX 2026");
@@ -145,7 +164,15 @@ public class CineMax {
     }
 
     /**
-     * Menu dedicato alle operazioni del Cliente
+     * Gestisce il sottomenu dedicato alle operazioni esclusive del Cliente.
+     * <p>
+     * Permette all'utente di consultare il palinsesto, effettuare nuove prenotazioni
+     * controllando la disponibilità dei posti, e visualizzare lo storico dei biglietti acquistati.
+     * </p>
+     * 
+     * @param scanner l'oggetto {@link Scanner} per la lettura dell'input da console
+     * @param db      il riferimento al {@link GestoreDati} per l'accesso e la modifica dei dati
+     * @param cliente l'oggetto {@link Utente} contenente i dati dell'account attualmente loggato
      */
     private static void menuCliente(Scanner scanner, GestoreDati db, Utente cliente) {
         boolean inAreaRiservata = true;
@@ -258,7 +285,14 @@ public class CineMax {
     }
     
     /**
-     * Menu dedicato al Proiezionista (Task assegnato ad Anes)
+     * Menu dedicato al Proiezionista (Task assegnato ad Anes).
+     * <p>
+     * Attualmente funge da mock/stub in attesa dell'implementazione definitiva del backend.
+     * </p>
+     * 
+     * @param scanner       l'oggetto {@link Scanner} per la lettura dell'input da console
+     * @param db            il riferimento al {@link GestoreDati}
+     * @param proiezionista l'oggetto {@link Utente} relativo all'account loggato
      */
     private static void menuProiezionista(Scanner scanner, GestoreDati db, Utente proiezionista) {
         System.out.println("\n--- AREA PROIEZIONISTA ---");
@@ -267,7 +301,14 @@ public class CineMax {
     }
     
     /**
-     * Menu dedicato al Bigliettaio (Task assegnato ad Anes)
+     * Menu dedicato al Bigliettaio (Task assegnato ad Anes).
+     * <p>
+     * Attualmente funge da mock/stub in attesa dell'implementazione definitiva del backend.
+     * </p>
+     * 
+     * @param scanner     l'oggetto {@link Scanner} per la lettura dell'input da console
+     * @param db          il riferimento al {@link GestoreDati}
+     * @param bigliettaio l'oggetto {@link Utente} relativo all'account loggato
      */
     private static void menuBigliettaio(Scanner scanner, GestoreDati db, Utente bigliettaio) {
         System.out.println("\n--- AREA BIGLIETTAIO ---");

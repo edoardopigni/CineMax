@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | **Titolo** | CineMax — Sistema di prenotazione biglietti cinematografici |
-| **Autori** | Daniele, Edoardo Pigni |
+| **Autori** | Daniele Paoli, Edoardo Pigni, Anes Khaia|
 | **Data** | 23 agosto 2026 |
 | **Versione documento** | 1.0 |
 
@@ -39,7 +39,7 @@
 
 ## 1. Cos'è CineMax
 
-**CineMax** è un programma informatico pensato per gestire le prenotazioni dei biglietti di un cinema. Permette di consultare il palinsesto delle proiezioni, cercare i film per titolo, genere o regista, registrarsi come cliente e prenotare i posti in sala.
+**CineMax** è un programma pensato per gestire le prenotazioni dei biglietti di un cinema. Permette di consultare la lista delle proiezioni, cercare i film per titolo, genere o regista, registrarsi come cliente e prenotare i posti in sala.
 
 Il programma funziona attraverso una **finestra testuale** (detta anche *riga di comando* o *terminale*): non presenta pulsanti o icone grafiche, ma un menu numerato a cui si risponde digitando un numero e premendo **Invio**.
 
