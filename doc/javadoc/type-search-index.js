@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"cinemax","l":"CineMax"},{"p":"cinemax","l":"GestoreDati"},{"p":"cinemax","l":"OrarioDoc"},{"p":"cinemax","l":"Prenotazione"},{"p":"cinemax","l":"Proiezione"},{"p":"cinemax","l":"Utente"}];updateSearchResults();

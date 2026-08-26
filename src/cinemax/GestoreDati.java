@@ -7,35 +7,89 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Classe utility per la persistenza dei dati (CSV e file binari).
+ * Classe che funge da Data Access Object (DAO) e gestore della logica di business.
+ * <p>
+ * Centralizza l'accesso ai dati, gestendo il caricamento e il salvataggio persistente
+ * tramite file CSV e file binari serializzati. Mantiene in memoria lo stato dell'applicazione
+ * attraverso liste incapsulate e fornisce metodi sicuri per la ricerca, la validazione 
+ * e il calcolo delle disponibilità.
+ * </p>
+ * 
+ * @author Daniele Paoli
+ * @author Edoardo Pigni
+ * @author Anes Khaia
+ * @version 1.0
  */
 public class GestoreDati {
     
+    /**
+     * Percorso relativo del file binario utilizzato per la persistenza degli utenti.
+     */
     private static final String FILE_UTENTI = "data/utenti.dat";
+
+    /**
+     * Percorso relativo del file binario utilizzato per la persistenza delle prenotazioni.
+     */
     private static final String FILE_PRENOTAZIONI = "data/prenotazioni.dat";
+
+    /**
+     * Percorso relativo del file testuale CSV contenente il palinsesto delle proiezioni.
+     */
     private static final String FILE_PROIEZIONI_CSV = "data/proiezioni.csv";
 
-    // Liste in memoria rese PRIVATE per l'incapsulamento
+    /**
+     * Lista in memoria contenente tutti gli utenti registrati nel sistema.
+     */
     private List<Utente> listaUtenti = new ArrayList<>();
+
+    /**
+     * Lista in memoria contenente tutte le prenotazioni effettuate.
+     */
     private List<Prenotazione> listaPrenotazioni = new ArrayList<>();
+
+    /**
+     * Lista in memoria contenente il palinsesto delle proiezioni disponibili.
+     */
     private List<Proiezione> listaProiezioni = new ArrayList<>();
 
     // --- GETTER PER LE LISTE ---
+    
+    /**
+     * Restituisce la lista di tutte le proiezioni attualmente caricate a sistema.
+     * 
+     * @return una lista di oggetti {@link Proiezione}
+     */
     public List<Proiezione> getListaProiezioni() {
         return listaProiezioni;
     }
 
+    /**
+     * Restituisce la lista di tutte le prenotazioni effettuate dai clienti.
+     * 
+     * @return una lista di oggetti {@link Prenotazione}
+     */
     public List<Prenotazione> getListaPrenotazioni() {
         return listaPrenotazioni;
     }
 
     // --- METODI CONTROLLATI PER AGGIUNGERE ELEMENTI ---
+    
+    /**
+     * Aggiunge in modo sicuro un nuovo utente alla lista in memoria.
+     * 
+     * @param u l'oggetto {@link Utente} da inserire a sistema
+     */
     public void aggiungiUtente(Utente u) {
         if (u != null) {
             listaUtenti.add(u);
         }
     }
 
+    /**
+     * Aggiunge in modo sicuro una nuova prenotazione alla lista in memoria.
+     * 
+     * @param p l'oggetto {@link Prenotazione} da inserire a sistema
+     */
     public void aggiungiPrenotazione(Prenotazione p) {
         if (p != null) {
             listaPrenotazioni.add(p);
@@ -43,7 +97,12 @@ public class GestoreDati {
     }
 
     /**
-     * Metodo da richiamare all'avvio dell'applicazione.
+     * Inizializza il sistema caricando tutti i dati salvati su disco.
+     * <p>
+     * Legge le proiezioni dal file CSV e deserializza utenti e prenotazioni dai file `.dat`.
+     * Se la lista utenti risulta vuota al primo avvio, genera automaticamente una configurazione
+     * di default inserendo 2 account Proiezionista e 5 account Bigliettaio.
+     * </p>
      */
     public void inizializzaSistema() {
         caricaProiezioniDalCSV();
@@ -64,7 +123,11 @@ public class GestoreDati {
     }
 
     /**
-     * Legge il file CSV gestendo correttamente i campi racchiusi tra virgolette.
+     * Legge il palinsesto delle proiezioni dal file CSV e popola la lista in memoria.
+     * <p>
+     * Utilizza una Regular Expression (Regex) avanzata per splittare correttamente i campi
+     * separati da virgola, ignorando le virgole interne a blocchi di testo racchiusi tra virgolette.
+     * </p>
      */
     public void caricaProiezioniDalCSV() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -112,6 +175,11 @@ public class GestoreDati {
     }
 
     // --- CARICAMENTO E SALVATAGGIO UTENTI ---
+    
+    /**
+     * Deserializza la lista degli utenti dal file binario preposto.
+     * Gestisce silenziosamente l'assenza del file al primo avvio.
+     */
     @SuppressWarnings("unchecked")
     public void caricaUtenti() {
         File f = new File(FILE_UTENTI);
@@ -124,6 +192,9 @@ public class GestoreDati {
         }
     }
 
+    /**
+     * Serializza la lista corrente degli utenti salvandola su file binario.
+     */
     public void salvaUtenti() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_UTENTI))) {
             oos.writeObject(listaUtenti);
@@ -133,6 +204,11 @@ public class GestoreDati {
     }
 
     // --- CARICAMENTO E SALVATAGGIO PRENOTAZIONI ---
+    
+    /**
+     * Deserializza la lista delle prenotazioni dal file binario preposto.
+     * Gestisce silenziosamente l'assenza del file in caso di archivio vuoto.
+     */
     @SuppressWarnings("unchecked")
     public void caricaPrenotazioni() {
         File f = new File(FILE_PRENOTAZIONI);
@@ -145,6 +221,9 @@ public class GestoreDati {
         }
     }
 
+    /**
+     * Serializza la lista corrente delle prenotazioni salvandola su file binario.
+     */
     public void salvaPrenotazioni() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PRENOTAZIONI))) {
             oos.writeObject(listaPrenotazioni);
@@ -154,7 +233,14 @@ public class GestoreDati {
     }
 
     /**
-     * Cerca le proiezioni filtrando per titolo, genere o regista.
+     * Esegue una ricerca lineare all'interno del palinsesto.
+     * <p>
+     * Il matching avviene in modalità case-insensitive controllando se la chiave 
+     * di ricerca è contenuta nel titolo, nel genere o nel nome del regista.
+     * </p>
+     * 
+     * @param chiaveDiRicerca la stringa immessa dall'utente per filtrare i film
+     * @return una lista contenente le proiezioni che soddisfano i criteri di ricerca
      */
     public List<Proiezione> ricercaProiezioni(String chiaveDiRicerca) {
         List<Proiezione> risultati = new ArrayList<>();
@@ -172,7 +258,11 @@ public class GestoreDati {
     }
 
     /**
-     * Verifica se uno username è già presente nella lista utenti.
+     * Verifica la disponibilità di uno username all'interno dell'anagrafica utenti.
+     * Viene utilizzato in fase di registrazione per prevenire duplicati.
+     * 
+     * @param username l'identificativo da verificare
+     * @return {@code true} se lo username è già registrato, {@code false} altrimenti
      */
     public boolean usernameGiaEsistente(String username) {
         for (Utente u : listaUtenti) {
@@ -184,7 +274,11 @@ public class GestoreDati {
     }
 
     /**
-     * Verifica le credenziali di accesso.
+     * Autentica un utente verificandone la corrispondenza esatta di username e password.
+     * 
+     * @param username lo username inserito
+     * @param password la password inserita
+     * @return l'oggetto {@link Utente} se le credenziali sono corrette, {@code null} in caso contrario
      */
     public Utente verificaCredenziali(String username, String password) {
         for (Utente u : listaUtenti) {
@@ -196,7 +290,14 @@ public class GestoreDati {
     }
 
     /**
-     * Calcola i posti ancora disponibili per una proiezione.
+     * Calcola dinamicamente il numero di posti ancora disponibili per un dato spettacolo.
+     * <p>
+     * Il calcolo viene effettuato sottraendo alla capienza totale della sala ({@code Proiezione.POSTI_TOTALI})
+     * la somma dei posti già allocati nelle prenotazioni attive per quello specifico film e orario.
+     * </p>
+     * 
+     * @param p la proiezione di cui verificare la disponibilità residua
+     * @return il numero intero di posti liberi e prenotabili
      */
     public int calcolaPostiDisponibili(Proiezione p) {
         int postiOccupati = 0;
