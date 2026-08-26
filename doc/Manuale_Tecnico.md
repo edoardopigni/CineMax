@@ -2,25 +2,23 @@
 
 ---
 
-
 |                        |                                                             |
 | ---------------------- | ----------------------------------------------------------- |
 | **Titolo**             | CineMax — Sistema di prenotazione biglietti cinematografici |
 | **Autori**             | Daniele Paoli, Edoardo Pigni, Anes Khaia                    |
-| **Data**               | 23 agosto 2026                                              |
+| **Data**               | 26 agosto 2026                                              |
 | **Versione documento** | 1.0                                                         |
-
 
 ---
 
 ## Indice
 
 1. [Installazione](#1-installazione)
-  1.1. [Requisiti di sistema](#11-requisiti-di-sistema)
+   1.1. [Requisiti di sistema](#11-requisiti-di-sistema)
    1.2. [Setup ambiente](#12-setup-ambiente)
    1.3. [Installazione programma](#13-installazione-programma)
 2. [Esecuzione ed uso](#2-esecuzione-ed-uso)
-  2.1. [Setup e lancio del programma](#21-setup-e-lancio-del-programma)
+   2.1. [Setup e lancio del programma](#21-setup-e-lancio-del-programma)
    2.2. [Uso delle funzionalità (Architettura, Dati e Algoritmi)](#22-uso-delle-funzionalit-architettura-dati-e-algoritmi)
 3. [Data set di test](#3-data-set-di-test)
 4. [Limiti della soluzione sviluppata](#4-limiti-della-soluzione-sviluppata)
